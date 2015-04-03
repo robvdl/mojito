@@ -4,12 +4,12 @@ Mojito is yet another micro web framework for Go, similar to Martini and
 Negroni. It was originally based on the Negroni codebase, making the
 middleware stack compatible with Negroni.
 
-It is slightly more opinionated however, by choosing a particular router,
-(Gorilla Mux) and template library (Pongo2) for you, I wanted to make it even
-easier to get started and write apps with Mojito.  You don't need to bring in
-other libraries like unrolled/render in order to render templates for example
-and then add another layer on top of that to handle Pongo templates, this is
-something I feel should be built into the Mojito framework itself to make
+It is slightly more opinionated however, by choosing a particular router
+(Gorilla Mux) and template library (Pongo2), I wanted to make it even easier
+to get started and write apps with Mojito.  You don't need to bring in other
+libraries like unrolled/render in order to render template responses for example
+and then add another library on top of that to handle Pongo templates, this is
+something I felt should be built into the Mojito framework itself to make
 things easier and reduce the number of dependencies required.
 
 Unlike Negroni, that DOES make Mojito a framework, Negroni is mostly just
