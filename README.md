@@ -9,8 +9,7 @@ It is slightly more opinionated however, by choosing a particular router
 to get started and write apps with Mojito.  You don't need to bring in other
 libraries like unrolled/render in order to render template responses for example
 and then add another library on top of that to handle Pongo templates, this is
-something I felt should be built into the Mojito framework itself to make
-things easier and reduce the number of dependencies required.
+something I felt should be built into the Mojito framework itself.
 
 Unlike Negroni, that DOES make Mojito a framework, Negroni is mostly just
 a middleware stack but still requires other components to make it a framework.
@@ -23,6 +22,9 @@ Negroni is the best idea, but we'll see where it takes us.
 
 After installing Go and setting up your [GOPATH](http://golang.org/doc/code.html#GOPATH),
 create your first `.go` file. We'll call it `server.go`.
+
+The following example has two view functions, one that renders a Pongo2
+template and the other returns some JSON.
 
 ```go
 package main
@@ -47,3 +49,9 @@ func main() {
     m.Run(":3000")
 }
 ```
+
+Because we are using mojito.Classic to construct our application, which has
+default settings for the templates and static files directories, you should
+create the two directories "./templates" and "./public" now.
+
+The above example expects a Pongo2 template "templates/index.html" to exist.
