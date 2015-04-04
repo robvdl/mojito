@@ -59,5 +59,5 @@ The above example expects a Pongo2 template "templates/index.html" to exist.
 NOTE: Pongo2 requires template variables to be in a map[string]interface{}
 type and it won't accept other types like map[string]string.  You can use the
 pongo2.Context type which is the same as map[string]interface{}, either is
-acceotabke. JSON and XML requests do not have such restrictions and you can
+acceptable. JSON and XML requests do not have such restrictions and you can
 use any data type that can be be marshaled to JSON.
