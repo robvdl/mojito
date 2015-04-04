@@ -11,7 +11,7 @@ func (m *Mojito) Get(path string, handler ViewFunc) {
 		handler(&Context{
 			Options: m.options,
 			Request: req,
-			Writer:  &rw,
+			Writer:  rw,
 		})
 	})
 }

@@ -39,11 +39,11 @@ func main() {
     m := mojito.Classic()
 
     m.Get("/", func(c *mojito.Context) {
-        c.HTML(http.StatusOK, "index", map[string]string{"hello": "mojito"})
+        c.HTML(http.StatusOK, "index.html", mojito.Vars{"hello": "mojito"})
     })
 
     m.Get("/json", func(c *mojito.Context) {
-        c.JSON(http.StatusOK, map[string]string{"hello": "mojito"})
+        c.JSON(http.StatusOK, mojito.Vars{"hello": "mojito", "count": 10})
     })
 
     m.Run(":3000")
@@ -55,3 +55,6 @@ default settings for the templates and static files directories, you should
 create the two directories "./templates" and "./public" now.
 
 The above example expects a Pongo2 template "templates/index.html" to exist.
+
+NOTE: For template variables you can use either mojito.Vars, pongo2.Context or
+map[string]interface{}, as these are all the same type really.
