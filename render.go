@@ -15,21 +15,14 @@ type Context struct {
 }
 
 // HTML renders a template and returns the output as an HTML response
-func (c *Context) HTML(status int, template string, data interface{}) {
+func (c *Context) HTML(status int, template string, data map[string]interface{}) {
 	tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, template))
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
 
-	// Pongo2 context must be of type map[string]interface{}, use type assertion
-	// to check that the type is correct first and convert it.
-	pongoContext, ok := data.(map[string]interface{})
-	if ok {
-		err = tpl.ExecuteWriter(pongoContext, c.Writer)
-		if err != nil {
-			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-		}
-	} else {
+	err = tpl.ExecuteWriter(data, c.Writer)
+	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
 
