@@ -8,13 +8,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Options is a struct for specifying configuration options for the
-// mojito.Mojito application object.
-type Options struct {
-	TemplateDirectory string
-	IsDevelopment     bool
-}
-
 // Mojito is a stack of Middleware Handlers that can be invoked as an
 // http.Handler. Mojito middleware are evaluated in the order that they are
 // added to the stack using the Use and UseHandler methods.
@@ -43,8 +36,13 @@ func New(opt *Options, handlers ...Handler) *Mojito {
 // Logger - Request/Response Logging
 // Static - Static File Serving
 func Classic() *Mojito {
+	// default options used by mojito.Classic().
 	options := Options{
 		TemplateDirectory: "templates",
+		Charset:           defaultCharset,
+		IndentJSON:        false,
+		IndentXML:         false,
+		HTMLContentType:   ContentHTML,
 		IsDevelopment:     false,
 	}
 	return New(&options, NewRecovery(), NewLogger(), NewStatic(http.Dir("public")))
