@@ -39,11 +39,11 @@ func main() {
     m := mojito.Classic()
 
     m.Get("/", func(c *mojito.Context) {
-        c.HTML(http.StatusOK, "index.html", mojito.Vars{"hello": "mojito"})
+        c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "mojito"})
     })
 
     m.Get("/json", func(c *mojito.Context) {
-        c.JSON(http.StatusOK, mojito.Vars{"hello": "mojito", "count": 10})
+        c.JSON(http.StatusOK, map[string]string{"hello": "mojito"})
     })
 
     m.Run(":3000")
@@ -56,5 +56,8 @@ create the two directories "./templates" and "./public" now.
 
 The above example expects a Pongo2 template "templates/index.html" to exist.
 
-NOTE: For template variables you can use either mojito.Vars, pongo2.Context or
-map[string]interface{}, as these are all the same type really.
+NOTE: Pongo2 requires template variables to be in a map[string]interface{}
+type and it won't accept other types like map[string]string.  You can use the
+pongo2.Context type which is the same as map[string]interface{}, either is
+acceotabke. JSON and XML requests do not have such restrictions and you can
+use any data type that can be be marshaled to JSON.
