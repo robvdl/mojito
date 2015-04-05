@@ -1,4 +1,4 @@
-# Mojito Web Framework [![GoDoc](https://godoc.org/github.com/robvdl/mojito?status.svg)](http://godoc.org/github.com/robvdl/mojito)
+# Mojito [![GoDoc](https://godoc.org/github.com/robvdl/mojito?status.svg)](http://godoc.org/github.com/robvdl/mojito) [![gocover badge](http://gocover.io/_badge/github.com/robvdl/mojito?t=3)](http://gocover.io/github.com/robvdl/mojito)
 
 Mojito is yet another micro web framework for Go, similar to Martini and
 Negroni. It was originally based on the Negroni codebase, making the
