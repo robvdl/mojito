@@ -72,3 +72,19 @@ func (c *Context) JSON(status int, data interface{}) {
 
 	j.Render(c.Writer, data)
 }
+
+// JSONP marshals the given interface object and writes the JSON response.
+func (c *Context) JSONP(status int, callback string, data interface{}) {
+	head := Head{
+		ContentType: ContentJSONP + "; charset=" + c.Options.Charset,
+		Status:      status,
+	}
+
+	j := JSONP{
+		Head:     head,
+		Indent:   c.Options.IndentJSON,
+		Callback: callback,
+	}
+
+	j.Render(c.Writer, data)
+}

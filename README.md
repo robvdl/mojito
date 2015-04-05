@@ -39,11 +39,15 @@ func main() {
     m := mojito.Classic()
 
     m.Get("/", func(c *mojito.Context) {
-        c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "mojito"})
+        c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "html"})
     })
 
     m.Get("/json", func(c *mojito.Context) {
-        c.JSON(http.StatusOK, map[string]string{"hello": "mojito"})
+        c.JSON(http.StatusOK, map[string]string{"hello": "json"})
+    })
+
+    m.Get("/jsonp", func(c *mojito.Context) {
+        c.JSONP(http.StatusOK, "callbackName", map[string]string{"hello": "jsonp"})
     })
 
     m.Run(":3000")

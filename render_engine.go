@@ -27,6 +27,13 @@ type JSON struct {
 	Prefix []byte
 }
 
+// JSONP built-in renderer.
+type JSONP struct {
+	Head
+	Indent   bool
+	Callback string
+}
+
 // Write outputs the header content.
 func (h *Head) Write(w http.ResponseWriter) {
 	w.Header().Set(ContentType, h.ContentType)
@@ -61,5 +68,32 @@ func (j *JSON) Render(w http.ResponseWriter, data interface{}) error {
 		w.Write(j.Prefix)
 	}
 	w.Write(result)
+	return nil
+}
+
+// Render a JSONP response.
+func (j *JSONP) Render(w http.ResponseWriter, data interface{}) error {
+	var result []byte
+	var err error
+
+	if j.Indent {
+		result, err = json.MarshalIndent(data, "", "  ")
+	} else {
+		result, err = json.Marshal(data)
+	}
+	if err != nil {
+		return err
+	}
+
+	// JSON marshaled fine, write out the result.
+	j.Head.Write(w)
+	w.Write([]byte(j.Callback + "("))
+	w.Write(result)
+	w.Write([]byte(");"))
+
+	// If indenting, append a new line.
+	if j.Indent {
+		w.Write([]byte("\n"))
+	}
 	return nil
 }
