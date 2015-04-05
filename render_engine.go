@@ -8,6 +8,11 @@ import (
 	"github.com/flosch/pongo2"
 )
 
+// Engine is the generic interface for all responses.
+type Engine interface {
+	Render(http.ResponseWriter, interface{}) error
+}
+
 // Head defines the basic ContentType and Status fields.
 type Head struct {
 	ContentType string
@@ -48,13 +53,13 @@ type XML struct {
 }
 
 // Write outputs the header content.
-func (h *Head) Write(w http.ResponseWriter) {
+func (h Head) Write(w http.ResponseWriter) {
 	w.Header().Set(ContentType, h.ContentType)
 	w.WriteHeader(h.Status)
 }
 
 // Render a data response.
-func (d *Data) Render(w http.ResponseWriter, data interface{}) error {
+func (d Data) Render(w http.ResponseWriter, data interface{}) error {
 	c := w.Header().Get(ContentType)
 	if c != "" {
 		d.Head.ContentType = c
@@ -65,15 +70,15 @@ func (d *Data) Render(w http.ResponseWriter, data interface{}) error {
 	return nil
 }
 
-// Render an HTML response.
-func (h *HTML) Render(w http.ResponseWriter, data map[string]interface{}) error {
+// Render an HTML response using Pongo2.
+func (h HTML) Render(w http.ResponseWriter, data interface{}) error {
 	h.Head.Write(w)
-	err := h.Template.ExecuteWriter(data, w)
+	err := h.Template.ExecuteWriter(data.(map[string]interface{}), w)
 	return err
 }
 
 // Render a JSON response.
-func (j *JSON) Render(w http.ResponseWriter, data interface{}) error {
+func (j JSON) Render(w http.ResponseWriter, data interface{}) error {
 	var result []byte
 	var err error
 
@@ -97,7 +102,7 @@ func (j *JSON) Render(w http.ResponseWriter, data interface{}) error {
 }
 
 // Render a JSONP response.
-func (j *JSONP) Render(w http.ResponseWriter, data interface{}) error {
+func (j JSONP) Render(w http.ResponseWriter, data interface{}) error {
 	var result []byte
 	var err error
 
@@ -124,7 +129,7 @@ func (j *JSONP) Render(w http.ResponseWriter, data interface{}) error {
 }
 
 // Render an XML response.
-func (x *XML) Render(w http.ResponseWriter, data interface{}) error {
+func (x XML) Render(w http.ResponseWriter, data interface{}) error {
 	var result []byte
 	var err error
 

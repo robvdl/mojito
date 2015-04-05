@@ -35,6 +35,15 @@ type Context struct {
 	Writer  http.ResponseWriter
 }
 
+// Render is the generic function called by XML, JSON, Data, and can be called
+// by custom implementations.
+func (c *Context) Render(w http.ResponseWriter, e Engine, data interface{}) {
+	err := e.Render(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // Data writes out the raw bytes as binary data.
 func (c *Context) Data(status int, data []byte) {
 	head := Head{
@@ -46,13 +55,13 @@ func (c *Context) Data(status int, data []byte) {
 		Head: head,
 	}
 
-	d.Render(c.Writer, data)
+	c.Render(c.Writer, d, data)
 }
 
 // HTML renders a template and returns the output as an HTML response
-func (c *Context) HTML(status int, template string, data map[string]interface{}) {
+func (c *Context) HTML(status int, name string, data map[string]interface{}) {
 	// Load Pongo2 template
-	tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, template))
+	tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, name))
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
@@ -64,11 +73,11 @@ func (c *Context) HTML(status int, template string, data map[string]interface{})
 
 	h := HTML{
 		Head:     head,
-		Name:     template,
+		Name:     name,
 		Template: tpl,
 	}
 
-	h.Render(c.Writer, data)
+	c.Render(c.Writer, h, data)
 }
 
 // JSON marshals the given interface object and writes a JSON response.
@@ -84,7 +93,7 @@ func (c *Context) JSON(status int, data interface{}) {
 		Prefix: c.Options.PrefixJSON,
 	}
 
-	j.Render(c.Writer, data)
+	c.Render(c.Writer, j, data)
 }
 
 // JSONP marshals the given interface object and writes the JSON response.
@@ -100,7 +109,7 @@ func (c *Context) JSONP(status int, callback string, data interface{}) {
 		Callback: callback,
 	}
 
-	j.Render(c.Writer, data)
+	c.Render(c.Writer, j, data)
 }
 
 // XML marshals the given interface object and writes the XML response.
@@ -116,5 +125,5 @@ func (c *Context) XML(status int, data interface{}) {
 		Prefix: c.Options.PrefixXML,
 	}
 
-	x.Render(c.Writer, data)
+	c.Render(c.Writer, x, data)
 }
