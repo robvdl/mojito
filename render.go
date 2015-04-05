@@ -61,23 +61,22 @@ func (c *Context) Data(status int, data []byte) {
 // HTML renders a template and returns the output as an HTML response
 func (c *Context) HTML(status int, name string, data map[string]interface{}) {
 	// Load Pongo2 template
-	tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, name))
-	if err != nil {
+	if tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, name)); err == nil {
+		head := Head{
+			ContentType: c.Options.HTMLContentType + "; charset=" + c.Options.Charset,
+			Status:      status,
+		}
+
+		h := HTML{
+			Head:     head,
+			Name:     name,
+			Template: tpl,
+		}
+
+		c.Render(c.Writer, h, data)
+	} else {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
-
-	head := Head{
-		ContentType: c.Options.HTMLContentType + "; charset=" + c.Options.Charset,
-		Status:      status,
-	}
-
-	h := HTML{
-		Head:     head,
-		Name:     name,
-		Template: tpl,
-	}
-
-	c.Render(c.Writer, h, data)
 }
 
 // JSON marshals the given interface object and writes a JSON response.

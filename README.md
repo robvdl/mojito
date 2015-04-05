@@ -78,7 +78,7 @@ func main() {
 }
 ```
 
-Because we are using mojito.Classic to construct our application, which has
+Because we are using mojito.Classic() to construct our application, which has
 default settings for the templates and static files directories, you should
 create the two directories "./templates" and "./public" now.
 
