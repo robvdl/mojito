@@ -49,6 +49,10 @@ func main() {
         c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "html"})
     })
 
+    m.Get("/data", func(c *mojito.Context) {
+        c.Data(http.StatusOK, []byte("Some binary data here."))
+    })
+
     m.Get("/json", func(c *mojito.Context) {
         c.JSON(http.StatusOK, map[string]string{"hello": "json"})
     })

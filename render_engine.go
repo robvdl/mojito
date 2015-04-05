@@ -14,7 +14,12 @@ type Head struct {
 	Status      int
 }
 
-// HTML built-in template renderer.
+// Data built-in renderer.
+type Data struct {
+	Head
+}
+
+// HTML built-in Pongo2 renderer.
 type HTML struct {
 	Head
 	Name     string
@@ -46,6 +51,18 @@ type XML struct {
 func (h *Head) Write(w http.ResponseWriter) {
 	w.Header().Set(ContentType, h.ContentType)
 	w.WriteHeader(h.Status)
+}
+
+// Render a data response.
+func (d *Data) Render(w http.ResponseWriter, data interface{}) error {
+	c := w.Header().Get(ContentType)
+	if c != "" {
+		d.Head.ContentType = c
+	}
+
+	d.Head.Write(w)
+	w.Write(data.([]byte))
+	return nil
 }
 
 // Render an HTML response.

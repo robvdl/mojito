@@ -35,6 +35,20 @@ type Context struct {
 	Writer  http.ResponseWriter
 }
 
+// Data writes out the raw bytes as binary data.
+func (c *Context) Data(status int, data []byte) {
+	head := Head{
+		ContentType: ContentBinary,
+		Status:      status,
+	}
+
+	d := Data{
+		Head: head,
+	}
+
+	d.Render(c.Writer, data)
+}
+
 // HTML renders a template and returns the output as an HTML response
 func (c *Context) HTML(status int, template string, data map[string]interface{}) {
 	// Load Pongo2 template
