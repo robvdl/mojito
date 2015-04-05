@@ -54,7 +54,6 @@ func (c *Context) HTML(status int, template string, data map[string]interface{})
 		Template: tpl,
 	}
 
-	head.Write(c.Writer)
 	h.Render(c.Writer, data)
 }
 
@@ -71,6 +70,5 @@ func (c *Context) JSON(status int, data interface{}) {
 		Prefix: c.Options.PrefixJSON,
 	}
 
-	head.Write(c.Writer)
 	j.Render(c.Writer, data)
 }

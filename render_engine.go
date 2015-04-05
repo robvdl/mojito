@@ -35,7 +35,9 @@ func (h *Head) Write(w http.ResponseWriter) {
 
 // Render an HTML response.
 func (h *HTML) Render(w http.ResponseWriter, data map[string]interface{}) error {
-	return h.Template.ExecuteWriter(data, w)
+	h.Head.Write(w)
+	err := h.Template.ExecuteWriter(data, w)
+	return err
 }
 
 // Render a JSON response.
