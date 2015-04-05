@@ -1,4 +1,4 @@
-# Mojito [![GoDoc](https://godoc.org/github.com/robvdl/mojito?status.svg)](http://godoc.org/github.com/robvdl/mojito) [![Build Status](https://travis-ci.org/robvdl/mojito.svg?branch=master)](https://travis-ci.org/robvdl/mojito) [![Coverage Status](https://img.shields.io/coveralls/robvdl/mojito.svg)](https://coveralls.io/r/robvdl/mojito)
+# Mojito [![GoDoc](https://godoc.org/github.com/robvdl/mojito?status.svg)](http://godoc.org/github.com/robvdl/mojito) [![Build Status](https://travis-ci.org/robvdl/mojito.svg?branch=master)](https://travis-ci.org/robvdl/mojito) [![Coverage Status](https://img.shields.io/coveralls/robvdl/mojito.svg)](https://coveralls.io/r/robvdl/mojito) [![Go Report Card](http://goreportcard.com/badge/robvdl/mojito)](http:/goreportcard.com/report/robvdl/mojito)
 
 Mojito is yet another micro web framework for Go, similar to Martini and
 Negroni. It was originally based on the Negroni codebase, making the
