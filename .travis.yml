@@ -1,6 +1,5 @@
 # Travis CI (http://travis-ci.org/) is a continuous integration service for
-# open source projects. This file configures it to run unit tests for
-# blackfriday.
+# open source projects. This file configures it to run unit tests.
 
 language: go
 
@@ -9,9 +8,14 @@ go:
     - 1.3
     - 1.4
 
+before_install:
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+  - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+
 install:
     - go get -d -t -v ./...
     - go build -v ./...
 
 script:
-    - go test -v ./...
+    - $HOME/gopath/bin/goveralls -service=travis-ci
