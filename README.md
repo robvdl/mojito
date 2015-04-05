@@ -43,6 +43,10 @@ type exampleXML struct {
     Two     string   `xml:"two,attr"`
 }
 
+func postHandler(c *mojito.Context) {
+    c.JSON(http.StatusOK, map[string]string{"result": "OK"})
+}
+
 func main() {
     m := mojito.Classic()
 
@@ -66,6 +70,7 @@ func main() {
         c.XML(http.StatusOK, exampleXML{One: "hello", Two: "xml"})
     })
 
+    // Render some Markdown as HTML
     m.Get("/markdown", func(c *mojito.Context) {
         if markdown, err := ioutil.ReadFile("README.md"); err == nil {
             c.Markdown(http.StatusOK, markdown)
@@ -73,6 +78,15 @@ func main() {
             http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
         }
     })
+
+    // Post requests and handler function example
+    m.Post("/post", postHandler)
+
+    // Multiple request methods on a view are also supported, using the same
+    // syntax as the underlying gorilla/mux router.  Any other options supported
+    // by gorilla/mux should also be supported, because Handle returns the
+    // *mux.Route that it registers with Gorilla Mux, making this possible.
+    m.Handle("/all", postHandler).Methods("GET", "POST", "PUT", "DELETE", "PATCH")
 
     m.Run(":3000")
 }
