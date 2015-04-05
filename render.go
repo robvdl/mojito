@@ -58,7 +58,19 @@ func (c *Context) HTML(status int, template string, data map[string]interface{})
 	h.Render(c.Writer, data)
 }
 
-// JSON renders a JSON response.
+// JSON marshals the given interface object and writes a JSON response.
 func (c *Context) JSON(status int, data interface{}) {
+	head := Head{
+		ContentType: ContentJSON + "; charset=" + c.Options.Charset,
+		Status:      status,
+	}
 
+	j := JSON{
+		Head:   head,
+		Indent: c.Options.IndentJSON,
+		Prefix: c.Options.PrefixJSON,
+	}
+
+	head.Write(c.Writer)
+	j.Render(c.Writer, data)
 }
