@@ -37,21 +37,25 @@ type Context struct {
 
 // HTML renders a template and returns the output as an HTML response
 func (c *Context) HTML(status int, template string, data map[string]interface{}) {
-	head := Head{
-		ContentType: c.Options.HTMLContentType + "; charset=" + c.Options.Charset,
-		Status:      status,
-	}
-	head.Write(c.Writer)
-
+	// Load Pongo2 template
 	tpl, err := pongo2.FromFile(filepath.Join(c.Options.TemplateDirectory, template))
 	if err != nil {
 		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
 	}
 
-	err = tpl.ExecuteWriter(data, c.Writer)
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+	head := Head{
+		ContentType: c.Options.HTMLContentType + "; charset=" + c.Options.Charset,
+		Status:      status,
 	}
+
+	h := HTML{
+		Head:     head,
+		Name:     template,
+		Template: tpl,
+	}
+
+	head.Write(c.Writer)
+	h.Render(c.Writer, data)
 }
 
 // JSON renders a JSON response.
