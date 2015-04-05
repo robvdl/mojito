@@ -30,10 +30,17 @@ template and the other returns some JSON.
 package main
 
 import (
+    "encoding/xml"
     "net/http"
 
     "github.com/robvdl/mojito"
 )
+
+type exampleXML struct {
+    XMLName xml.Name `xml:"example"`
+    One     string   `xml:"one,attr"`
+    Two     string   `xml:"two,attr"`
+}
 
 func main() {
     m := mojito.Classic()
@@ -48,6 +55,10 @@ func main() {
 
     m.Get("/jsonp", func(c *mojito.Context) {
         c.JSONP(http.StatusOK, "callbackName", map[string]string{"hello": "jsonp"})
+    })
+
+    m.Get("/xml", func(c *mojito.Context) {
+        c.XML(http.StatusOK, exampleXML{One: "hello", Two: "xml"})
     })
 
     m.Run(":3000")

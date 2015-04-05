@@ -2,6 +2,7 @@ package mojito
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"net/http"
 
 	"github.com/flosch/pongo2"
@@ -32,6 +33,13 @@ type JSONP struct {
 	Head
 	Indent   bool
 	Callback string
+}
+
+// XML built-in renderer.
+type XML struct {
+	Head
+	Indent bool
+	Prefix []byte
 }
 
 // Write outputs the header content.
@@ -95,5 +103,29 @@ func (j *JSONP) Render(w http.ResponseWriter, data interface{}) error {
 	if j.Indent {
 		w.Write([]byte("\n"))
 	}
+	return nil
+}
+
+// Render an XML response.
+func (x *XML) Render(w http.ResponseWriter, data interface{}) error {
+	var result []byte
+	var err error
+
+	if x.Indent {
+		result, err = xml.MarshalIndent(data, "", "  ")
+		result = append(result, '\n')
+	} else {
+		result, err = xml.Marshal(data)
+	}
+	if err != nil {
+		return err
+	}
+
+	// XML marshaled fine, write out the result.
+	x.Head.Write(w)
+	if len(x.Prefix) > 0 {
+		w.Write(x.Prefix)
+	}
+	w.Write(result)
 	return nil
 }

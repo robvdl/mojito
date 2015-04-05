@@ -88,3 +88,19 @@ func (c *Context) JSONP(status int, callback string, data interface{}) {
 
 	j.Render(c.Writer, data)
 }
+
+// XML marshals the given interface object and writes the XML response.
+func (c *Context) XML(status int, data interface{}) {
+	head := Head{
+		ContentType: ContentXML + "; charset=" + c.Options.Charset,
+		Status:      status,
+	}
+
+	x := XML{
+		Head:   head,
+		Indent: c.Options.IndentXML,
+		Prefix: c.Options.PrefixXML,
+	}
+
+	x.Render(c.Writer, data)
+}
