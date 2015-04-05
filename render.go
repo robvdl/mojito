@@ -127,3 +127,17 @@ func (c *Context) XML(status int, data interface{}) {
 
 	c.Render(c.Writer, x, data)
 }
+
+// Markdown renders Markdown content and writes the HTML response.
+func (c *Context) Markdown(status int, data []byte) {
+	head := Head{
+		ContentType: ContentHTML + "; charset=" + c.Options.Charset,
+		Status:      status,
+	}
+
+	m := Markdown{
+		Head: head,
+	}
+
+	c.Render(c.Writer, m, data)
+}

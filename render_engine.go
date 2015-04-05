@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/flosch/pongo2"
+	"github.com/russross/blackfriday"
 )
 
 // Engine is the generic interface for all responses.
@@ -50,6 +51,12 @@ type XML struct {
 	Head
 	Indent bool
 	Prefix []byte
+}
+
+// Markdown built-in renderer using Blackfriday.
+type Markdown struct {
+	Head
+	Name string
 }
 
 // Write outputs the header content.
@@ -149,5 +156,13 @@ func (x XML) Render(w http.ResponseWriter, data interface{}) error {
 		w.Write(x.Prefix)
 	}
 	w.Write(result)
+	return nil
+}
+
+// Render a Markdown response as HTML.
+func (m Markdown) Render(w http.ResponseWriter, data interface{}) error {
+	m.Head.Write(w)
+	output := blackfriday.MarkdownCommon(data.([]byte))
+	w.Write(output)
 	return nil
 }

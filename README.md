@@ -31,6 +31,7 @@ package main
 
 import (
     "encoding/xml"
+    "io/ioutil"
     "net/http"
 
     "github.com/robvdl/mojito"
@@ -63,6 +64,14 @@ func main() {
 
     m.Get("/xml", func(c *mojito.Context) {
         c.XML(http.StatusOK, exampleXML{One: "hello", Two: "xml"})
+    })
+
+    m.Get("/markdown", func(c *mojito.Context) {
+        if markdown, err := ioutil.ReadFile("README.md"); err == nil {
+            c.Markdown(http.StatusOK, markdown)
+        } else {
+            http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+        }
     })
 
     m.Run(":3000")
