@@ -43,6 +43,7 @@ func Classic() *Mojito {
 		Charset:           defaultCharset,
 		IndentJSON:        false,
 		IndentXML:         false,
+		CommonMarkdown:    true,
 		HTMLContentType:   ContentHTML,
 		IsDevelopment:     false,
 	}

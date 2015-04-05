@@ -56,7 +56,8 @@ type XML struct {
 // Markdown built-in renderer using Blackfriday.
 type Markdown struct {
 	Head
-	Name string
+	Name           string
+	CommonMarkdown bool
 }
 
 // Write outputs the header content.
@@ -161,8 +162,15 @@ func (x XML) Render(w http.ResponseWriter, data interface{}) error {
 
 // Render a Markdown response as HTML.
 func (m Markdown) Render(w http.ResponseWriter, data interface{}) error {
+	var output []byte
+
 	m.Head.Write(w)
-	output := blackfriday.MarkdownCommon(data.([]byte))
+	input := data.([]byte)
+	if m.CommonMarkdown {
+		output = blackfriday.MarkdownCommon(input)
+	} else {
+		output = blackfriday.MarkdownBasic(input)
+	}
 	w.Write(output)
 	return nil
 }

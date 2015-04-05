@@ -12,6 +12,8 @@ type Options struct {
 	IndentJSON bool
 	// Outputs human readable XML if true.
 	IndentXML bool
+	// Use either Common or Basic Markdown (see: github.com/russross/blackfriday)
+	CommonMarkdown bool
 	// Prefixes the JSON output with the given bytes.
 	PrefixJSON []byte
 	// Prefixes the XML output with the given bytes.

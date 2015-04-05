@@ -135,7 +135,8 @@ func (c *Context) Markdown(status int, data []byte) {
 	}
 
 	m := Markdown{
-		Head: head,
+		Head:           head,
+		CommonMarkdown: c.Options.CommonMarkdown,
 	}
 
 	c.Render(c.Writer, m, data)
