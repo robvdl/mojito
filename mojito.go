@@ -1,4 +1,4 @@
-// Package mojito provides a micro web framework and middleware stack.
+// Package mojito is a web framework and middleware stack, originally based on Negroni.
 package mojito
 
 import (
