@@ -1,3 +1,4 @@
+// Package mojito provides a micro web framework and middleware stack.
 package mojito
 
 import (
