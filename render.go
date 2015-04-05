@@ -35,8 +35,8 @@ type Context struct {
 	Writer  http.ResponseWriter
 }
 
-// Render is the generic function called by XML, JSON, Data, and can be called
-// by custom implementations.
+// Render is the generic function called by XML, JSON, Data, HTML, and can be
+// called by custom implementations.
 func (c *Context) Render(w http.ResponseWriter, e Engine, data interface{}) {
 	err := e.Render(w, data)
 	if err != nil {
