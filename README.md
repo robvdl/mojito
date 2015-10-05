@@ -1,5 +1,7 @@
 # Mojito [![GoDoc](https://godoc.org/github.com/robvdl/mojito?status.svg)](http://godoc.org/github.com/robvdl/mojito) [![Build Status](https://travis-ci.org/robvdl/mojito.svg?branch=master)](https://travis-ci.org/robvdl/mojito) [![Coverage Status](https://img.shields.io/coveralls/robvdl/mojito.svg)](https://coveralls.io/r/robvdl/mojito) [![Go Report Card](http://goreportcard.com/badge/robvdl/mojito)](http:/goreportcard.com/report/robvdl/mojito)
 
+**WARNING: this is an abandoned project that I whipped up over a weekend some time ago, since then I've started using [GIN](https://github.com/gin-gonic/gin) now and no longer maintain this project.  Please take this into consideration before starting a new project using this library.**
+
 Mojito is yet another micro web framework for Go, similar to Martini and
 Negroni. It was originally based on the Negroni codebase, making the
 middleware stack compatible with Negroni.
