@@ -17,7 +17,7 @@ func ErrorHandlerWithNoContext(w ResponseWriter, r *Request, err interface{}) {
 }
 
 func TestNoErrorHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/action", (*Context).ErrorAction)
 
 	admin := router.Subrouter(AdminContext{}, "/admin")
@@ -33,7 +33,7 @@ func TestNoErrorHandler(t *testing.T) {
 }
 
 func TestHandlerOnRoot(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Error((*Context).ErrorHandler)
 	router.Get("/action", (*Context).ErrorAction)
 
@@ -50,7 +50,7 @@ func TestHandlerOnRoot(t *testing.T) {
 }
 
 func TestContextlessError(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Error(ErrorHandlerWithNoContext)
 	router.Get("/action", (*Context).ErrorAction)
 
@@ -68,7 +68,7 @@ func TestContextlessError(t *testing.T) {
 }
 
 func TestMultipleErrorHandlers(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Error((*Context).ErrorHandler)
 	router.Get("/action", (*Context).ErrorAction)
 
@@ -86,7 +86,7 @@ func TestMultipleErrorHandlers(t *testing.T) {
 }
 
 func TestMultipleErrorHandlers2(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/action", (*Context).ErrorAction)
 
 	admin := router.Subrouter(AdminContext{}, "/admin")
@@ -111,7 +111,7 @@ func TestMultipleErrorHandlers2(t *testing.T) {
 }
 
 func TestRootMiddlewarePanic(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).ErrorMiddleware)
 	router.Error((*Context).ErrorHandler)
 	admin := router.Subrouter(AdminContext{}, "/admin")
@@ -124,7 +124,7 @@ func TestRootMiddlewarePanic(t *testing.T) {
 }
 
 func TestNonRootMiddlewarePanic(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Error((*Context).ErrorHandler)
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	admin.Middleware((*AdminContext).ErrorMiddleware)
@@ -148,7 +148,7 @@ func TestPanicLogging(t *testing.T) {
 		PanicHandler = oldHandler
 	}()
 
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/action", (*Context).ErrorAction)
 
 	rw, req := newTestRequest("GET", "/action")
@@ -161,7 +161,7 @@ func TestPanicLogging(t *testing.T) {
 }
 
 func TestConsistentContext(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Error((*Context).ErrorHandler)
 	admin := router.Subrouter(Context{}, "/admin")
 	admin.Error((*Context).ErrorHandlerSecondary)

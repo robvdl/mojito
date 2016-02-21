@@ -71,7 +71,7 @@ func gocraftWebHandler(rw ResponseWriter, r *Request) {
 }
 
 func gocraftWebRouterFor(namespaces []string, resources []string) http.Handler {
-	router := New(BenchContext{})
+	router := Classic(BenchContext{})
 	for _, ns := range namespaces {
 		subrouter := router.Subrouter(BenchContext{}, "/"+ns)
 		for _, res := range resources {
@@ -86,7 +86,7 @@ func gocraftWebRouterFor(namespaces []string, resources []string) http.Handler {
 }
 
 func BenchmarkGocraftWeb_Simple(b *testing.B) {
-	router := New(BenchContext{})
+	router := Classic(BenchContext{})
 	router.Get("/action", gocraftWebHandler)
 
 	rw, req := testRequest("GET", "/action")
@@ -118,7 +118,7 @@ func BenchmarkGocraftWeb_Route3000(b *testing.B) {
 }
 
 func BenchmarkGocraftWeb_Middleware(b *testing.B) {
-	router := New(BenchContext{})
+	router := Classic(BenchContext{})
 	router.Middleware((*BenchContext).Middleware)
 	router.Middleware((*BenchContext).Middleware)
 	routerB := router.Subrouter(BenchContextB{}, "/b")
@@ -144,7 +144,7 @@ func BenchmarkGocraftWeb_Generic(b *testing.B) {
 		next(rw, r)
 	}
 
-	router := New(BenchContext{})
+	router := Classic(BenchContext{})
 	router.Middleware(nextMw)
 	router.Middleware(nextMw)
 	routerB := router.Subrouter(BenchContextB{}, "/b")
@@ -168,7 +168,7 @@ func BenchmarkGocraftWeb_Generic(b *testing.B) {
 func BenchmarkGocraftWeb_Composite(b *testing.B) {
 	namespaces, resources, requests := resourceSetup(10)
 
-	router := New(BenchContext{})
+	router := Classic(BenchContext{})
 	router.Middleware(func(c *BenchContext, rw ResponseWriter, r *Request, next NextMiddlewareFunc) {
 		c.MyField = r.URL.Path
 		next(rw, r)

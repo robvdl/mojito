@@ -17,7 +17,7 @@ func (c *Context) HandlerWithContext(rw ResponseWriter, r *Request) {
 }
 
 func TestNoHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	rw, req := newTestRequest("GET", "/this_path_doesnt_exist")
 	router.ServeHTTP(rw, req)
@@ -25,7 +25,7 @@ func TestNoHandler(t *testing.T) {
 }
 
 func TestBadMethod(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	rw, req := newTestRequest("POOP", "/this_path_doesnt_exist")
 	router.ServeHTTP(rw, req)
@@ -33,7 +33,7 @@ func TestBadMethod(t *testing.T) {
 }
 
 func TestWithHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.NotFound(MyNotFoundHandler)
 
 	rw, req := newTestRequest("GET", "/this_path_doesnt_exist")
@@ -42,7 +42,7 @@ func TestWithHandler(t *testing.T) {
 }
 
 func TestWithRootContext(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.NotFound((*Context).HandlerWithContext)
 
 	rw, req := newTestRequest("GET", "/this_path_doesnt_exist")

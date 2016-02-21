@@ -3,8 +3,10 @@ package mojito
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"sort"
 	"strings"
 	"testing"
@@ -54,7 +56,7 @@ func stringifyMap(m map[string]string) string {
 }
 
 func TestRoutes(t *testing.T) {
-	router := New(Ctx{})
+	router := Classic(Ctx{})
 
 	table := []routeTest{
 		{
@@ -187,7 +189,9 @@ func TestRoutes(t *testing.T) {
 }
 
 func TestRoutesWithPrefix(t *testing.T) {
-	router := NewWithPrefix(Ctx{}, "/v1")
+	router := NewWithPrefix(Ctx{}, &Config{
+		Logger: log.New(os.Stdout, "", 0),
+	}, "/v1")
 
 	table := []routeTest{
 		{
@@ -305,7 +309,7 @@ func TestRoutesWithPrefix(t *testing.T) {
 }
 
 func TestRouteVerbs(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/a", func(w ResponseWriter, r *Request) {
 		fmt.Fprintf(w, "GET")
 	})
@@ -348,7 +352,7 @@ func TestRouteVerbs(t *testing.T) {
 }
 
 func TestRouteHead(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/a", (*Context).A)
 
 	rw, req := newTestRequest("GET", "/a")
@@ -361,7 +365,7 @@ func TestRouteHead(t *testing.T) {
 }
 
 func TestIsRouted(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware(func(w ResponseWriter, r *Request, next NextMiddlewareFunc) {
 		if r.IsRouted() {
 			t.Error("Shouldn't be routed yet but was.")

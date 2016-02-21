@@ -11,7 +11,7 @@ import (
 func TestStaticMiddleware(t *testing.T) {
 	currentRoot, _ := os.Getwd()
 
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware(StaticMiddleware(currentRoot))
 	router.Get("/action", (*Context).A)
 
@@ -61,7 +61,7 @@ func TestStaticMiddlewareOptionIndex(t *testing.T) {
 	defer os.Remove(nestedIndexFilename)
 
 	// Make router. Static middleware rooted at first temp dir
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware(StaticMiddleware(dirName, StaticOption{IndexFile: "index.html"}))
 	router.Get("/action", (*Context).A)
 
@@ -84,7 +84,7 @@ func TestStaticMiddlewareOptionIndex(t *testing.T) {
 func TestStaticMiddlewareOptionPrefix(t *testing.T) {
 	currentRoot, _ := os.Getwd()
 
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware(StaticMiddleware(currentRoot, StaticOption{Prefix: "/public"}))
 	router.Get("/action", (*Context).A)
 

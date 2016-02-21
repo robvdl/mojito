@@ -8,7 +8,7 @@ import (
 )
 
 func TestOptionsHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	sub := router.Subrouter(Context{}, "/sub")
 	sub.Middleware(AccessControlMiddleware)
@@ -27,7 +27,7 @@ func TestOptionsHandler(t *testing.T) {
 }
 
 func TestCustomOptionsHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.OptionsHandler((*Context).OptionsHandler)
 
 	sub := router.Subrouter(Context{}, "/sub")

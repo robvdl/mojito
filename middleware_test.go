@@ -70,7 +70,7 @@ func mwGenricInterface(ctx interface{}, w ResponseWriter, r *Request, next NextM
 }
 
 func TestFlatNoMiddleware(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/action", (*Context).A)
 	router.Get("/action_z", (*Context).Z)
 
@@ -84,7 +84,7 @@ func TestFlatNoMiddleware(t *testing.T) {
 }
 
 func TestFlatOneMiddleware(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	router.Get("/action", (*Context).A)
 	router.Get("/action_z", (*Context).Z)
@@ -99,7 +99,7 @@ func TestFlatOneMiddleware(t *testing.T) {
 }
 
 func TestFlatTwoMiddleware(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	router.Middleware((*Context).mwBeta)
 	router.Get("/action", (*Context).A)
@@ -115,7 +115,7 @@ func TestFlatTwoMiddleware(t *testing.T) {
 }
 
 func TestDualTree(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	router.Get("/action", (*Context).A)
 	admin := router.Subrouter(AdminContext{}, "/admin")
@@ -139,7 +139,7 @@ func TestDualTree(t *testing.T) {
 }
 
 func TestDualLeaningLeftTree(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Get("/action", (*Context).A)
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	admin.Get("/action", (*AdminContext).B)
@@ -161,7 +161,7 @@ func TestDualLeaningLeftTree(t *testing.T) {
 }
 
 func TestTicketsA(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	admin.Middleware((*AdminContext).mwEpsilon)
 	tickets := admin.Subrouter(TicketsContext{}, "/tickets")
@@ -173,7 +173,7 @@ func TestTicketsA(t *testing.T) {
 }
 
 func TestTicketsB(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	tickets := admin.Subrouter(TicketsContext{}, "/tickets")
 	tickets.Middleware((*TicketsContext).mwEta)
@@ -185,7 +185,7 @@ func TestTicketsB(t *testing.T) {
 }
 
 func TestTicketsC(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	tickets := admin.Subrouter(TicketsContext{}, "/tickets")
@@ -197,7 +197,7 @@ func TestTicketsC(t *testing.T) {
 }
 
 func TestTicketsD(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	admin := router.Subrouter(AdminContext{}, "/admin")
 	tickets := admin.Subrouter(TicketsContext{}, "/tickets")
@@ -210,7 +210,7 @@ func TestTicketsD(t *testing.T) {
 }
 
 func TestTicketsE(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha)
 	router.Middleware((*Context).mwBeta)
 	router.Middleware((*Context).mwGamma)
@@ -227,7 +227,7 @@ func TestTicketsE(t *testing.T) {
 }
 
 func TestNoNext(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwNoNext)
 	router.Get("/action", (*Context).A)
 
@@ -237,7 +237,7 @@ func TestNoNext(t *testing.T) {
 }
 
 func TestSameContext(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware((*Context).mwAlpha).
 		Middleware((*Context).mwBeta)
 	admin := router.Subrouter(Context{}, "/admin")
@@ -250,7 +250,7 @@ func TestSameContext(t *testing.T) {
 }
 
 func TestSameNamespace(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	admin := router.Subrouter(AdminContext{}, "/")
 	admin.Get("/action", (*AdminContext).B)
 
@@ -260,7 +260,7 @@ func TestSameNamespace(t *testing.T) {
 }
 
 func TestInterfaceMiddleware(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 	router.Middleware(mwGenricInterface)
 	router.Get("/action", (*Context).A)
 

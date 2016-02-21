@@ -9,10 +9,11 @@ import (
 
 func TestLoggerMiddleware(t *testing.T) {
 	var buf bytes.Buffer
-	Logger = log.New(&buf, "", 0)
 
-	router := New(Context{})
-	router.Middleware(LoggerMiddleware)
+	router := New(Context{}, &Config{
+		Logger: log.New(&buf, "", 0),
+	})
+	router.Middleware((*Context).LoggerMiddleware)
 	router.Get("/action", (*Context).A)
 
 	// Hit an action:

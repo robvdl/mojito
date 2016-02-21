@@ -55,18 +55,20 @@ func assertResponse(t *testing.T, rr *httptest.ResponseRecorder, body string, co
 //
 // Some default contexts and possible error handlers / actions
 //
-type Context struct{}
+type BaseContext struct {
+	*Context
+}
 
 type AdminContext struct {
-	*Context
+	*BaseContext
 }
 
 type APIContext struct {
-	*Context
+	*BaseContext
 }
 
 type SiteContext struct {
-	*Context
+	*BaseContext
 }
 
 type TicketsContext struct {

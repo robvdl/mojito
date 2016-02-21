@@ -6,8 +6,8 @@ import (
 )
 
 func TestShowErrorsMiddleware(t *testing.T) {
-	router := New(Context{})
-	router.Middleware(ShowErrorsMiddleware)
+	router := Classic(Context{})
+	router.Middleware((*Context).ShowErrorsMiddleware)
 	router.Get("/action", (*Context).A)
 	router.Get("/boom", (*Context).ErrorAction)
 

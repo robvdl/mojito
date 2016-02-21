@@ -20,22 +20,22 @@ type invalidSubcontext2 struct {
 
 func TestInvalidContext(t *testing.T) {
 	assert.Panics(t, func() {
-		New(1)
+		Classic(1)
 	})
 
 	assert.Panics(t, func() {
-		router := New(Context{})
+		router := Classic(Context{})
 		router.Subrouter(invalidSubcontext{}, "")
 	})
 
 	assert.Panics(t, func() {
-		router := New(Context{})
+		router := Classic(Context{})
 		router.Subrouter(invalidSubcontext2{}, "")
 	})
 }
 
 func TestInvalidHandler(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	assert.Panics(t, func() {
 		router.Get("/action", 1)
@@ -64,7 +64,7 @@ func TestInvalidHandler(t *testing.T) {
 }
 
 func TestInvalidMiddleware(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	assert.Panics(t, func() {
 		router.Middleware((*Context).InvalidHandler)
@@ -72,7 +72,7 @@ func TestInvalidMiddleware(t *testing.T) {
 }
 
 func TestInvalidNotFound(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	assert.Panics(t, func() {
 		router.NotFound((*Context).InvalidHandler)
@@ -86,7 +86,7 @@ func TestInvalidNotFound(t *testing.T) {
 }
 
 func TestInvalidError(t *testing.T) {
-	router := New(Context{})
+	router := Classic(Context{})
 
 	assert.Panics(t, func() {
 		router.Error((*Context).InvalidHandler)
