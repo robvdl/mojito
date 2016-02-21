@@ -7,92 +7,69 @@ import (
 	"net/http"
 )
 
-// ResponseWriter is a wrapper around http.ResponseWriter that provides extra
-// information about the response. It is recommended that middleware handlers
-// use this construct to wrap a responsewriter if the functionality calls
-// for it.
+// ResponseWriter includes net/http's ResponseWriter and adds a StatusCode() method to obtain the written status code.
+// A ResponseWriter is sent to handlers on each request.
 type ResponseWriter interface {
 	http.ResponseWriter
 	http.Flusher
-	// Status returns the status code of the response or 0 if the response
-	// has not been written.
-	Status() int
-	// Written returns whether or not the ResponseWriter has been written.
+	http.Hijacker
+	http.CloseNotifier
+
+	// StatusCode returns the written status code, or 0 if none has been written yet.
+	StatusCode() int
+	// Written returns whether the header has been written yet.
 	Written() bool
-	// Size returns the size of the response body.
+	// Size returns the size in bytes of the body written so far.
 	Size() int
-	// Before allows for a function to be called before the ResponseWriter has
-	// been written to. This is/ useful for setting headers or any other
-	// operations that must happen before a response has been written.
-	Before(func(ResponseWriter))
 }
 
-type beforeFunc func(ResponseWriter)
-
-// NewResponseWriter creates a ResponseWriter that wraps an http.ResponseWriter
-func NewResponseWriter(rw http.ResponseWriter) ResponseWriter {
-	return &responseWriter{rw, 0, 0, nil}
-}
-
-type responseWriter struct {
+type appResponseWriter struct {
 	http.ResponseWriter
-	status      int
-	size        int
-	beforeFuncs []beforeFunc
+	statusCode int
+	size       int
 }
 
-func (rw *responseWriter) WriteHeader(s int) {
-	rw.status = s
-	rw.callBefore()
-	rw.ResponseWriter.WriteHeader(s)
-}
-
-func (rw *responseWriter) Write(b []byte) (int, error) {
-	if !rw.Written() {
-		// The status will be StatusOK if WriteHeader has not been called yet
-		rw.WriteHeader(http.StatusOK)
+// Don't need this yet because we get it for free:
+func (w *appResponseWriter) Write(data []byte) (n int, err error) {
+	if w.statusCode == 0 {
+		w.statusCode = http.StatusOK
 	}
-	size, err := rw.ResponseWriter.Write(b)
-	rw.size += size
+	size, err := w.ResponseWriter.Write(data)
+	w.size += size
 	return size, err
 }
 
-func (rw *responseWriter) Status() int {
-	return rw.status
+func (w *appResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func (rw *responseWriter) Size() int {
-	return rw.size
+func (w *appResponseWriter) StatusCode() int {
+	return w.statusCode
 }
 
-func (rw *responseWriter) Written() bool {
-	return rw.status != 0
+func (w *appResponseWriter) Written() bool {
+	return w.statusCode != 0
 }
 
-func (rw *responseWriter) Before(before func(ResponseWriter)) {
-	rw.beforeFuncs = append(rw.beforeFuncs, before)
+func (w *appResponseWriter) Size() int {
+	return w.size
 }
 
-func (rw *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	hijacker, ok := rw.ResponseWriter.(http.Hijacker)
+func (w *appResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	hijacker, ok := w.ResponseWriter.(http.Hijacker)
 	if !ok {
 		return nil, nil, fmt.Errorf("the ResponseWriter doesn't support the Hijacker interface")
 	}
 	return hijacker.Hijack()
 }
 
-func (rw *responseWriter) CloseNotify() <-chan bool {
-	return rw.ResponseWriter.(http.CloseNotifier).CloseNotify()
+func (w *appResponseWriter) CloseNotify() <-chan bool {
+	return w.ResponseWriter.(http.CloseNotifier).CloseNotify()
 }
 
-func (rw *responseWriter) callBefore() {
-	for i := len(rw.beforeFuncs) - 1; i >= 0; i-- {
-		rw.beforeFuncs[i](rw)
-	}
-}
-
-func (rw *responseWriter) Flush() {
-	flusher, ok := rw.ResponseWriter.(http.Flusher)
+func (w *appResponseWriter) Flush() {
+	flusher, ok := w.ResponseWriter.(http.Flusher)
 	if ok {
 		flusher.Flush()
 	}

@@ -7,18 +7,37 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
+
+type hijackableResponse struct {
+	Hijacked bool
+}
+
+func (h *hijackableResponse) Header() http.Header {
+	return nil
+}
+func (h *hijackableResponse) Write(buf []byte) (int, error) {
+	return 0, nil
+}
+func (h *hijackableResponse) WriteHeader(code int) {
+	// no-op
+}
+func (h *hijackableResponse) Flush() {
+	// no-op
+}
+func (h *hijackableResponse) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h.Hijacked = true
+	return nil, nil, nil
+}
+func (h *hijackableResponse) CloseNotify() <-chan bool {
+	return nil
+}
 
 type closeNotifyingRecorder struct {
 	*httptest.ResponseRecorder
 	closed chan bool
-}
-
-func newCloseNotifyingRecorder() *closeNotifyingRecorder {
-	return &closeNotifyingRecorder{
-		httptest.NewRecorder(),
-		make(chan bool, 1),
-	}
 }
 
 func (c *closeNotifyingRecorder) close() {
@@ -29,107 +48,60 @@ func (c *closeNotifyingRecorder) CloseNotify() <-chan bool {
 	return c.closed
 }
 
-type hijackableResponse struct {
-	Hijacked bool
-}
-
-func newHijackableResponse() *hijackableResponse {
-	return &hijackableResponse{}
-}
-
-func (h *hijackableResponse) Header() http.Header           { return nil }
-func (h *hijackableResponse) Write(buf []byte) (int, error) { return 0, nil }
-func (h *hijackableResponse) WriteHeader(code int)          {}
-func (h *hijackableResponse) Flush()                        {}
-func (h *hijackableResponse) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	h.Hijacked = true
-	return nil, nil, nil
-}
-
-func TestResponseWriterWritingString(t *testing.T) {
+func TestResponseWriterWrite(t *testing.T) {
 	rec := httptest.NewRecorder()
-	rw := NewResponseWriter(rec)
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: rec})
 
-	rw.Write([]byte("Hello world"))
+	assert.Equal(t, rw.Written(), false)
 
-	expect(t, rec.Code, rw.Status())
-	expect(t, rec.Body.String(), "Hello world")
-	expect(t, rw.Status(), http.StatusOK)
-	expect(t, rw.Size(), 11)
-	expect(t, rw.Written(), true)
+	n, err := rw.Write([]byte("Hello world"))
+	assert.Equal(t, n, 11)
+	assert.NoError(t, err)
+
+	assert.Equal(t, n, 11)
+	assert.Equal(t, rec.Code, rw.StatusCode())
+	assert.Equal(t, rec.Code, http.StatusOK)
+	assert.Equal(t, rec.Body.String(), "Hello world")
+	assert.Equal(t, rw.Size(), 11)
+	assert.Equal(t, rw.Written(), true)
 }
 
-func TestResponseWriterWritingStrings(t *testing.T) {
+func TestResponseWriterWriteHeader(t *testing.T) {
 	rec := httptest.NewRecorder()
-	rw := NewResponseWriter(rec)
-
-	rw.Write([]byte("Hello world"))
-	rw.Write([]byte("foo bar bat baz"))
-
-	expect(t, rec.Code, rw.Status())
-	expect(t, rec.Body.String(), "Hello worldfoo bar bat baz")
-	expect(t, rw.Status(), http.StatusOK)
-	expect(t, rw.Size(), 26)
-}
-
-func TestResponseWriterWritingHeader(t *testing.T) {
-	rec := httptest.NewRecorder()
-	rw := NewResponseWriter(rec)
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: rec})
 
 	rw.WriteHeader(http.StatusNotFound)
-
-	expect(t, rec.Code, rw.Status())
-	expect(t, rec.Body.String(), "")
-	expect(t, rw.Status(), http.StatusNotFound)
-	expect(t, rw.Size(), 0)
-}
-
-func TestResponseWriterBefore(t *testing.T) {
-	rec := httptest.NewRecorder()
-	rw := NewResponseWriter(rec)
-	result := ""
-
-	rw.Before(func(ResponseWriter) {
-		result += "foo"
-	})
-	rw.Before(func(ResponseWriter) {
-		result += "bar"
-	})
-
-	rw.WriteHeader(http.StatusNotFound)
-
-	expect(t, rec.Code, rw.Status())
-	expect(t, rec.Body.String(), "")
-	expect(t, rw.Status(), http.StatusNotFound)
-	expect(t, rw.Size(), 0)
-	expect(t, result, "barfoo")
+	assert.Equal(t, rec.Code, rw.StatusCode())
+	assert.Equal(t, rec.Code, http.StatusNotFound)
 }
 
 func TestResponseWriterHijack(t *testing.T) {
-	hijackable := newHijackableResponse()
-	rw := NewResponseWriter(hijackable)
+	hijackable := &hijackableResponse{}
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: hijackable})
 	hijacker, ok := rw.(http.Hijacker)
-	expect(t, ok, true)
+	assert.True(t, ok)
 	_, _, err := hijacker.Hijack()
-	if err != nil {
-		t.Error(err)
-	}
-	expect(t, hijackable.Hijacked, true)
+	assert.NoError(t, err)
+	assert.True(t, hijackable.Hijacked)
 }
 
-func TestResponseWriteHijackNotOK(t *testing.T) {
-	hijackable := new(http.ResponseWriter)
-	rw := NewResponseWriter(*hijackable)
-	hijacker, ok := rw.(http.Hijacker)
-	expect(t, ok, true)
-	_, _, err := hijacker.Hijack()
+func TestResponseWriterHijackNotOK(t *testing.T) {
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: httptest.NewRecorder()})
+	_, _, err := rw.Hijack()
+	assert.Error(t, err)
+}
 
-	refute(t, err, nil)
+func TestResponseWriterFlush(t *testing.T) {
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: httptest.NewRecorder()})
+	rw.Flush()
 }
 
 func TestResponseWriterCloseNotify(t *testing.T) {
-	rec := newCloseNotifyingRecorder()
-	rw := NewResponseWriter(rec)
+	rec := &closeNotifyingRecorder{
+		httptest.NewRecorder(),
+		make(chan bool, 1),
+	}
+	rw := ResponseWriter(&appResponseWriter{ResponseWriter: rec})
 	closed := false
 	notifier := rw.(http.CloseNotifier).CloseNotify()
 	rec.close()
@@ -138,13 +110,5 @@ func TestResponseWriterCloseNotify(t *testing.T) {
 		closed = true
 	case <-time.After(time.Second):
 	}
-	expect(t, closed, true)
-}
-
-func TestResponseWriterFlusher(t *testing.T) {
-	rec := httptest.NewRecorder()
-	rw := NewResponseWriter(rec)
-
-	_, ok := rw.(http.Flusher)
-	expect(t, ok, true)
+	assert.True(t, closed)
 }
