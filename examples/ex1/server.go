@@ -11,9 +11,6 @@ import (
 // Context is your custom request context, it extends *mojito.Context
 type Context struct {
 	*mojito.Context
-	Test       int
-	Another    bool
-	AndAnother int
 }
 
 func (c *Context) testRoute(rw mojito.ResponseWriter, req *mojito.Request) {
