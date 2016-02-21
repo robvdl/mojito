@@ -1,6 +1,8 @@
 package mojito
 
 import (
+	"log"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -104,6 +106,15 @@ func New(ctx interface{}, cfg *Config) *Router {
 		r.root[method] = newPathNode()
 	}
 	return r
+}
+
+// Classic creates a new Mojito application with default Config.
+func Classic(ctx interface{}) *Router {
+	config := Config{
+		Logger: log.New(os.Stdout, "", 0),
+	}
+
+	return New(ctx, &config)
 }
 
 // NewWithPrefix returns a new router (see New) but each route will have an implicit prefix.

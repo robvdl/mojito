@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/robvdl/mojito"
 )
@@ -27,11 +25,7 @@ func setupRoutes(r *mojito.Router) {
 }
 
 func main() {
-	config := mojito.Config{
-		Logger: log.New(os.Stdout, "", 0),
-	}
-
-	m := mojito.New(Context{}, &config)
+	m := mojito.Classic(Context{})
 
 	setupMiddleware(m)
 	setupRoutes(m)
