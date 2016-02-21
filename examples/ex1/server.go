@@ -27,9 +27,11 @@ func setupRoutes(r *mojito.Router) {
 }
 
 func main() {
-	m := mojito.New(Context{}, &mojito.Config{
+	config := mojito.Config{
 		Logger: log.New(os.Stdout, "", 0),
-	})
+	}
+
+	m := mojito.New(Context{}, &config)
 
 	setupMiddleware(m)
 	setupRoutes(m)
