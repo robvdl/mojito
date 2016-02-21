@@ -37,9 +37,8 @@ func (rootRouter *Router) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	closure.RootRouter = rootRouter
 	closure.Request.rootContext = closure.Contexts[0]
 
-	// It appears that when you use a pointer to an embedded Context struct,
-	// it ends up being nil after the Context is created using reflect.New(),
-	// so we create the embedded Context here and "attach" it using reflect.
+	// The following few lines are needed in order to set the Config
+	// struct in the request Context, to point to the rootRouter.Config struct.
 	// TODO: we should probably to some checking here to ensure it's "safe".
 	embeddedContextField := reflect.Indirect(closure.Contexts[0]).Field(0)
 	embeddedContextStruct := Context{
