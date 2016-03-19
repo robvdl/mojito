@@ -20,27 +20,29 @@ eventually got me to rewrite Mojito from ground up as a brand new framework.
 Sample application
 ------------------
 
-    package main
+```go
+package main
 
-    import "github.com/robvdl/mojito"
+import "github.com/robvdl/mojito"
 
-    // Context is your custom request context, it must embed *mojito.Context
-    type Context struct {
-      *mojito.Context
-    }
+// Context is your custom request context, it must embed *mojito.Context
+type Context struct {
+  *mojito.Context
+}
 
-    // Home is a simple route based on your own Context.
-    func (c *Context) Home() {
-      c.Logger.Println("Home route")
-      c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "world"})
-    }
+// Home is a simple route based on your own Context.
+func (c *Context) Home() {
+  c.Logger.Println("Home route")
+  c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "world"})
+}
 
-    func main() {
-      config := mojito.LoadConfig("config.toml")
-      m := mojito.New(config, Context{})
-      m.Get("/", (*Context).Home)
-      m.Run()
-    }
+func main() {
+  config := mojito.LoadConfig("config.toml")
+  m := mojito.New(config, Context{})
+  m.Get("/", (*Context).Home)
+  m.Run()
+}
+```
 
 Built in support for config files
 ---------------------------------
@@ -54,17 +56,21 @@ however Viper can only load one set of config settings at once, as Viper
 uses a global configuration, while we store each configuration in a struct
 so you can load multiple configurations, if this is what your app requires.
 
-    config := mojito.LoadConfig("config.toml")
-    host := config.GetString("server.host")
-    port := config.GetString("server.port")
+```go
+config := mojito.LoadConfig("config.toml")
+host := config.GetString("server.host")
+port := config.GetString("server.port")
+```
 
 When you create a Mojito app, you need to pass it a config instance
 when calling mojito.New(), the config file will contain the server
 address and port, as well as database and cache settings, but can
 also contain logger configuration.
 
-    config := mojito.LoadConfig("config.toml")
-    m := mojito.New(config, Context{})
+```go
+config := mojito.LoadConfig("config.toml")
+m := mojito.New(config, Context{})
+```
 
 Some other configuration libraries might map your configuration file
 into a struct as it loads it, this seems nice at first, however it makes
