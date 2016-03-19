@@ -1,7 +1,13 @@
 package mojito
 
-// Context is the base request context applications should use.
-// Custom applications can extend this context and add new fields.
+import (
+	"log"
+	"net/http"
+)
+
+// Context is the base request context for all Mojito applications.
 type Context struct {
-	Config *Config
+	ResponseWriter *http.ResponseWriter
+	Request        *http.Request
+	Logger         *log.Logger
 }

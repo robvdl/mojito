@@ -2,48 +2,40 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/robvdl/mojito"
 )
 
-// Context is your custom request context, it extends *mojito.Context
+// Context is your own custom request context, it must embed *mojito.Context
 type Context struct {
 	*mojito.Context
 }
 
-// APIContext is a second context only used by the API subrouter
-type APIContext struct {
-	*Context
-}
-
-func (c *Context) appMiddleware(rw mojito.ResponseWriter, req *mojito.Request, next mojito.NextMiddlewareFunc) {
-	c.Config.Logger.Println("App middleware")
-	next(rw, req)
-}
-
-func (c *Context) testRoute(rw mojito.ResponseWriter, req *mojito.Request) {
-	fmt.Fprint(rw, "Test Route")
-}
-
-func (c *APIContext) apiRoute(rw mojito.ResponseWriter, req *mojito.Request) {
-	fmt.Fprint(rw, "API Route")
-}
-
-func (c *APIContext) apiMiddleware(rw mojito.ResponseWriter, req *mojito.Request, next mojito.NextMiddlewareFunc) {
-	c.Config.Logger.Println("API middleware")
-	next(rw, req)
+// Home is a simple route based on your own Context.
+func (c *Context) Home() {
+	c.Logger.Println("Home route")
+	// c.ResponseWriter
+	// c.Request
+	// c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "html"})
+	// c.JSON(http.StatusOK, map[string]string{"hello": "json"})
+	// c.Config
+	// c.User
 }
 
 func main() {
-	m := mojito.Classic(Context{})
-	m.Middleware((*Context).LoggerMiddleware)
-	m.Middleware((*Context).ShowErrorsMiddleware)
-	m.Middleware((*Context).appMiddleware)
-	m.Get("/", (*Context).testRoute)
+	config, err := mojito.LoadConfig("config.toml")
+	if err != nil {
+		fmt.Println("Failed to load config file:", err)
+		os.Exit(1)
+	}
 
-	api := m.Subrouter(APIContext{}, "/api")
-	api.Middleware((*APIContext).apiMiddleware)
-	api.Get("/tickets", (*APIContext).apiRoute)
+	m := mojito.New(config, Context{})
+	// m.use(mojito.SessionMiddleware)
+	// m.Use(mojito.AuthMiddleware)
+	// m.Get("/", (*Context).Home)
+	// admin := m.SubRouter("/admin", AdminContext{})
+	// admin.Get("/", (*AdminContext).Home)
 
-	m.Run("localhost:8000")
+	m.Run()
 }

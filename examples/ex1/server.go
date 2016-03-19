@@ -2,33 +2,35 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
 
 	"github.com/robvdl/mojito"
 )
 
-// Context is your custom request context, it extends *mojito.Context
+// Context is your own custom request context, it must embed *mojito.Context
 type Context struct {
 	*mojito.Context
 }
 
-func (c *Context) testRoute(rw mojito.ResponseWriter, req *mojito.Request) {
-	fmt.Fprint(rw, "Test Route")
-}
+// Home is a simple route based on your own Context.
+func (c *Context) Home() {
+	c.Logger.Println("Home route")
 
-func setupMiddleware(r *mojito.Router) {
-	r.Middleware((*Context).LoggerMiddleware)
-	r.Middleware((*Context).ShowErrorsMiddleware)
-}
-
-func setupRoutes(r *mojito.Router) {
-	r.Get("/", (*Context).testRoute)
+	c.HTML(http.StatusOK, "index.html", map[string]interface{}{
+		"hello": "world",
+	})
 }
 
 func main() {
-	m := mojito.Classic(Context{})
+	config, err := mojito.LoadConfig("config.toml")
+	if err != nil {
+		fmt.Println("Failed to load config file:", err)
+		os.Exit(1)
+	}
 
-	setupMiddleware(m)
-	setupRoutes(m)
+	m := mojito.New(config, Context{})
+	m.Get("/", (*Context).Home)
 
-	m.Run("localhost:8000")
+	m.Run()
 }

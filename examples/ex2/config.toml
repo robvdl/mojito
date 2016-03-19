@@ -1,0 +1,15 @@
+[server]
+host = "localhost"
+port = 8000
+tls = false
+
+[logger]
+handler = "stdout"
+prefix = ""
+flag = 0
+
+[database]
+host = "localhost"
+port = 5432
+username = "test"
+password = "password"

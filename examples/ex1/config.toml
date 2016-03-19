@@ -1,0 +1,9 @@
+[server]
+host = "localhost"
+port = 8000
+tls = false
+
+[logger]
+handler = "stdout"
+prefix = ""
+flag = 0
