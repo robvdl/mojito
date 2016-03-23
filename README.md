@@ -32,12 +32,12 @@ type Context struct {
 
 // Configure gets called automatically by mojito.New().
 func (c Context) Configure() *mojito.Config {
-	config, err := mojito.LoadConfig("config.toml")
-	if err != nil {
-		fmt.Println("Failed to load config file:", err)
-		os.Exit(1)
-	}
-	return config
+  config, err := mojito.LoadConfig("config.toml")
+  if err != nil {
+    fmt.Println("Failed to load config file:", err)
+    os.Exit(1)
+  }
+  return config
 }
 
 // Home is a simple route based on your own Context.
