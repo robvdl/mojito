@@ -5,11 +5,17 @@ import (
 	"reflect"
 )
 
+type Application interface {
+	Configure() *Config
+}
+
 // New creats a Mojito application by creating the root Router.
-func New(config *Config, ctx interface{}) *Router {
+func New(app Application) *Router {
+	config := app.Configure()
+
 	r := &Router{
 		pathPrefix:  "/",
-		contextType: reflect.TypeOf(ctx),
+		contextType: reflect.TypeOf(app),
 		Config:      config,
 		Logger:      GetLogger(config),
 	}
