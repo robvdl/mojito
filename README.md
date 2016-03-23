@@ -20,10 +20,15 @@ eventually got me to rewrite Mojito from ground up as a brand new framework.
 Sample application
 ------------------
 
+server.go:
+
 ```go
 package main
 
-import "github.com/robvdl/mojito"
+import (
+  "fmt"
+  "github.com/robvdl/mojito"
+)
 
 // Context is your custom request context, it must embed *mojito.Context
 type Context struct {
@@ -43,7 +48,9 @@ func (c Context) Configure() *mojito.Config {
 // Home is a simple route based on your own Context.
 func (c *Context) Home() {
   c.Logger.Println("Home route")
-  c.HTML(http.StatusOK, "index.html", map[string]interface{}{"hello": "world"})
+  c.HTML(http.StatusOK, "index.html", map[string]interface{}{
+    "hello": "world",
+  })
 }
 
 func main() {
@@ -51,6 +58,15 @@ func main() {
   m.Get("/", (*Context).Home)
   m.Run()
 }
+```
+
+config.toml:
+
+```toml
+[server]
+host = "localhost"
+port = 8000
+tls = false
 ```
 
 Built in support for config files
