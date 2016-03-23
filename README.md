@@ -30,6 +30,16 @@ type Context struct {
   *mojito.Context
 }
 
+// Configure gets called automatically by mojito.New().
+func (c Context) Configure() *mojito.Config {
+	config, err := mojito.LoadConfig("config.toml")
+	if err != nil {
+		fmt.Println("Failed to load config file:", err)
+		os.Exit(1)
+	}
+	return config
+}
+
 // Home is a simple route based on your own Context.
 func (c *Context) Home() {
   c.Logger.Println("Home route")
@@ -37,8 +47,7 @@ func (c *Context) Home() {
 }
 
 func main() {
-  config := mojito.LoadConfig("config.toml")
-  m := mojito.New(config, Context{})
+  m := mojito.New(Context{})
   m.Get("/", (*Context).Home)
   m.Run()
 }
@@ -62,15 +71,8 @@ host := config.GetString("server.host")
 port := config.GetString("server.port")
 ```
 
-When you create a Mojito app, you need to pass it a config instance
-when calling mojito.New(), the config file will contain the server
-address and port, as well as database and cache settings, but can
-also contain logger configuration.
-
-```go
-config := mojito.LoadConfig("config.toml")
-m := mojito.New(config, Context{})
-```
+Your base context must implement the mojito.Application interface,
+this means implementing the Configure() method (see example application).
 
 Some other configuration libraries might map your configuration file
 into a struct as it loads it, this seems nice at first, however it makes

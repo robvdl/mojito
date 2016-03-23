@@ -33,7 +33,7 @@ func (c *Context) Home() {
 }
 
 func main() {
-	m := mojito.New(config, Context{})
+	m := mojito.New(Context{})
 	m.Get("/", (*Context).Home)
 
 	m.Run()
